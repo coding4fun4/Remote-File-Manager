@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>93d78428-6098-4367-a711-11384c5c6dd2</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SharedCode</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Networking\ClientSocket.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Networking\Serialization.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Networking\ServerSocket.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\Client\Introduction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\Client\Packets.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\Controller\Packets.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Packets\Sessions\Packets.cs" />
+  </ItemGroup>
+</Project>
