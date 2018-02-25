@@ -23,7 +23,7 @@ namespace Controller_WinForms
 
         private CSession_Manager SessionManager { get; }
 
-        private string Key { get; set; }
+        private int Key { get; set; }
 
         public FrmController()
         {
@@ -57,7 +57,7 @@ namespace Controller_WinForms
             else this.Text = title;
         }
 
-        private void Connection_OnUpdateKey(string key)
+        private void Connection_OnUpdateKey(int key)
         {
             Key = key;
 
@@ -92,7 +92,7 @@ namespace Controller_WinForms
         {
             ListViewItem item;
 
-            if (LvClients.Items.Count < index)
+            if (LvClients.Items.Count <= index)
             {
                 item = new ListViewItem
                 {

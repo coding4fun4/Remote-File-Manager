@@ -51,7 +51,10 @@
             this.columnHeader3,
             this.columnHeader4});
             this.LvClients.ContextMenuStrip = this.CmsClients;
+            this.LvClients.FullRowSelect = true;
+            this.LvClients.GridLines = true;
             this.LvClients.Location = new System.Drawing.Point(12, 12);
+            this.LvClients.MultiSelect = false;
             this.LvClients.Name = "LvClients";
             this.LvClients.Size = new System.Drawing.Size(696, 229);
             this.LvClients.TabIndex = 0;
@@ -86,12 +89,12 @@
             this.CmsClients.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MiStartFileManagerSession});
             this.CmsClients.Name = "CmsClients";
-            this.CmsClients.Size = new System.Drawing.Size(176, 56);
+            this.CmsClients.Size = new System.Drawing.Size(165, 28);
             // 
             // MiStartFileManagerSession
             // 
             this.MiStartFileManagerSession.Name = "MiStartFileManagerSession";
-            this.MiStartFileManagerSession.Size = new System.Drawing.Size(175, 24);
+            this.MiStartFileManagerSession.Size = new System.Drawing.Size(164, 24);
             this.MiStartFileManagerSession.Text = "File Manager";
             this.MiStartFileManagerSession.Click += new System.EventHandler(this.MiStartFileManagerSession_Click);
             // 

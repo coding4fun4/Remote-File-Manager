@@ -63,8 +63,15 @@ namespace Server.Connections
                 bool sync = true;
                 byte[] source = null;
 
-                if (check && CheckSerialization<T>(one[i], result[i], out source))
-                    sync = false;
+                if (check)
+                {
+                    if (CheckSerialization<T>(one[i], result[i], out source))
+                        sync = false;
+                }
+                else
+                {
+                    source = CSerialization.Serialize<T>(one[i]);
+                }
 
                 if (sync)
                 {
@@ -111,6 +118,9 @@ namespace Server.Connections
             for (int ClientIndex = 0; ClientIndex < Connections.Count; ClientIndex++)
             {
                 if (Connections[ClientIndex].ConnectionType != EConnectionType.Client)
+                    continue;
+
+                if (Connections[ClientIndex].Information == null)
                     continue;
 
                 SClient ClientInfo = GetClientStructFromConnection(Connections[ClientIndex]);

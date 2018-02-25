@@ -65,9 +65,7 @@ namespace SharedCode.Networking
 
         public int GetHandle()
         {
-            string handle = GetIPv4Data()[1];
-
-            return int.Parse(handle);
+            return int.Parse(ClientSock.Handle.ToString());
         }
 
         void Reconnect()
@@ -184,7 +182,6 @@ namespace SharedCode.Networking
         public void SendPacket<T>(byte packet, T arguments)
         {
             byte[] buffer = CSerialization.Serialize<T>(arguments);
-
             SendPacket(packet, buffer);
         }
     }

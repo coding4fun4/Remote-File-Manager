@@ -36,7 +36,7 @@ namespace Controller_WinForms.Connection
         public delegate void delOnConnectionAuthorizationFailed();
         public event delOnConnectionAuthorizationFailed OnConnectionAuthorizationFailed;
 
-        public delegate void delOnUpdateKey(string key);
+        public delegate void delOnUpdateKey(int key);
         public event delOnUpdateKey OnUpdateKey;
 
         public delegate void delOnRemoveClient(int index);
@@ -81,9 +81,6 @@ namespace Controller_WinForms.Connection
 
         void OnClientsSync(EDataSyncType type, int index, object data)
         {
-            if (data.GetType() != typeof(SClient))
-                return;
-
             if(type == EDataSyncType.Remove)
             {
                 if(OnRemoveClient != null)
@@ -95,7 +92,9 @@ namespace Controller_WinForms.Connection
             {
                 if(OnUpdateClient != null)
                 {
-                    OnUpdateClient.Invoke(index, (SClient)data);
+                    SClient client = CSerialization.Deserialize<SClient>((byte[])data);
+
+                    OnUpdateClient.Invoke(index, client);
                 }
             }
         }
@@ -172,7 +171,10 @@ namespace Controller_WinForms.Connection
 
         private void ClientSocket_OnClientDisconnected()
         {
-            throw new NotImplementedException();
+            /*
+             * ToDo:
+             * - Cleanup everything after disconnect!
+             */
         }
 
         private void ClientSocket_OnClientConnected()

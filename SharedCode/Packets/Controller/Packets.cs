@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 
-using ProtoBuf;
-
 namespace SharedCode.Packets.Controller
 {
     enum EControllerPackets : byte
@@ -13,32 +11,25 @@ namespace SharedCode.Packets.Controller
         Session = 0x2
     }
 
-    [ProtoContract]
+    [Serializable]
     public struct SControllerIntroduction
     {
-        [ProtoMember(1)]
         public string Password;
     }
 
-    [ProtoContract]
+    [Serializable]
     public struct SControllerAnswer
     {
-        [ProtoMember(1)]
         public bool IsAuthorized;
-        [ProtoMember(2)]
-        public string key;
+        public int key;
     }
 
-    [ProtoContract]
+    [Serializable]
     public struct SClient
     {
-        [ProtoMember(1)]
         public int SocketHandle;
-        [ProtoMember(2)]
         public string IPAddress;
-        [ProtoMember(3)]
         public string UserName;
-        [ProtoMember(4)]
         public string OperatingSystem;
     }
 
@@ -53,16 +44,12 @@ namespace SharedCode.Packets.Controller
         Clients = 0x0
     }
 
-    [ProtoContract]
+    [Serializable]
     public struct SDataSync
     {
-        [ProtoMember(1)]
         public int index;
-        [ProtoMember(2)]
         public EDataSyncType type;
-        [ProtoMember(3)]
         public ESyncList list;
-        [ProtoMember(4)]
         public byte[] data;
     }
 }

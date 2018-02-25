@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 using Server;
 
@@ -12,8 +13,6 @@ using SharedCode;
 using SharedCode.Networking;
 using SharedCode.Packets.Client;
 using SharedCode.Packets.Controller;
-using ProtoBuf;
-using System.Threading;
 
 namespace Server.Connections
 {
@@ -28,7 +27,7 @@ namespace Server.Connections
     {
         public bool IsAuthorized;
         public List<SClient> Clients;
-        public string Key;
+        public int Key;
     }
 
     struct SConnection
@@ -124,15 +123,15 @@ namespace Server.Connections
             }
         }
 
-        string GenerateKeyForController()
+        int GenerateKeyForController()
         {
             bool generated = false;
 
-            string key = string.Empty;
+            int key = -1;
 
             while(!generated)
             {
-                key = RandomInstance.Next().ToString();
+                key = RandomInstance.Next();
 
                 bool exists = false;
 
@@ -166,7 +165,7 @@ namespace Server.Connections
             SControllerAnswer ControllerAnswer = new SControllerAnswer
             {
                 IsAuthorized = false,
-                key = string.Empty
+                key = -1
             };
 
             SConnection Connection = Connections[ConnectionIndex];
@@ -181,14 +180,17 @@ namespace Server.Connections
                 return;
             }
 
+            int key = GenerateKeyForController();
+            
             //Authorize connection
             SControllerInformation ControllerInformation = (SControllerInformation)Connection.Information;
             ControllerInformation.IsAuthorized = true;
+            ControllerInformation.Key = key;
             Connection.Information = (object)ControllerInformation;
             Connections[ConnectionIndex] = Connection;
 
             //Key for controlling clients
-            ControllerAnswer.key = GenerateKeyForController();
+            ControllerAnswer.key = key;
             ControllerAnswer.IsAuthorized = true;
 
             //Tell the controller that he is authorized
