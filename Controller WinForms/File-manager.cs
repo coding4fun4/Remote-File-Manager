@@ -36,8 +36,7 @@ namespace Controller_WinForms
 
         void SendIntroduction()
         {
-            SSessionPacket SessionPacket = new SSessionPacket();
-            SessionPacket.SessionId = Id;
+           
         }
 
         public void OnPacketReceived(ESessionPackets packet, byte[] arguments)

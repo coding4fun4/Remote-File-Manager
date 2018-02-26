@@ -13,6 +13,7 @@ using SharedCode;
 using SharedCode.Networking;
 using SharedCode.Packets.Client;
 using SharedCode.Packets.Controller;
+using SharedCode.Packets.Sessions;
 
 namespace Server.Connections
 {
@@ -90,8 +91,13 @@ namespace Server.Connections
 
         void InitPacketCallbacks()
         {
+            //Client
             PacketCallbacks.Add(new SPacketCallback() { ConnectionType = EConnectionType.Client, Packet = (byte)EClientPackets.Introduction, OnPacketCallback = OnClientIntroductionCallback });
+            PacketCallbacks.Add(new SPacketCallback() { ConnectionType = EConnectionType.Client, Packet = (byte)EClientPackets.Session, OnPacketCallback = OnClientSessionCallback });
+
+            //Controller
             PacketCallbacks.Add(new SPacketCallback() { ConnectionType = EConnectionType.Controller, Packet = (byte)EControllerPackets.Introduction, OnPacketCallback = OnControllerIntroductionCallback });
+            PacketCallbacks.Add(new SPacketCallback() { ConnectionType = EConnectionType.Controller, Packet = (byte)EControllerPackets.Session, OnPacketCallback = OnControllerSessionCallback });
         }
 
         void RemoveConnection(CClientSocket ClientSocket)
@@ -197,6 +203,27 @@ namespace Server.Connections
             Connection.ClientSocket.SendPacket<SControllerAnswer>((byte)EControllerPackets.Introduction, ControllerAnswer);
         }
 
+        void OnControllerSessionCallback(CClientSocket ClientSocket, int ConnectionIndex, byte[] arguments)
+        {
+            SSessionPacket SessionPacket = CSerialization.Deserialize<SSessionPacket>(arguments);
+
+            //Relay the session packet to the appropriate client
+            foreach(SConnection Connection in Connections)
+            {
+                if (Connection.ConnectionType != EConnectionType.Client)
+                    continue;
+
+                if (Connection.Information == null)
+                    continue;
+
+                if(Connection.ClientSocket.GetHandle() == SessionPacket.ClientHandle)
+                {
+                    Connection.ClientSocket.SendPacket<SSessionPacket>((byte)EClientPackets.Session, SessionPacket);
+                    break;
+                }
+            }
+        }
+
         void OnClientIntroductionCallback(CClientSocket ClientSocket, int ConnectionIndex, byte[] arguments)
         {
             SClientIntroduction ClientIntroduction = (SClientIntroduction)CSerialization.Deserialize<SClientIntroduction>(arguments);
@@ -204,6 +231,29 @@ namespace Server.Connections
             SConnection Connection = Connections[ConnectionIndex];
             Connection.Information = ClientIntroduction;
             Connections[ConnectionIndex] = Connection;
+        }
+
+        void OnClientSessionCallback(CClientSocket ClientSocket, int ConnectionIndex, byte[] arguments)
+        {
+            SSessionPacket SessionPacket = CSerialization.Deserialize<SSessionPacket>(arguments);
+
+            //Relay the session to the appropriate controller
+            foreach(SConnection Connection in Connections)
+            {
+                if (Connection.ConnectionType != EConnectionType.Controller)
+                    continue;
+
+                if (Connection.Information == null)
+                    continue;
+
+                SControllerInformation ControllerInformation = (SControllerInformation)Connection.Information;
+
+                if(ControllerInformation.IsAuthorized && ControllerInformation.Key == SessionPacket.ControllerKey)
+                {
+                    ClientSocket.SendPacket<SSessionPacket>((byte)EControllerPackets.Session, SessionPacket);
+                    break;
+                }
+            }
         }
 
         void HandleReceivedBuffer(CClientSocket ClientSocket, int ConnectionIndex, EConnectionType ConnectionType, byte[] buffer)

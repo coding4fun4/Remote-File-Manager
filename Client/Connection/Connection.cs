@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using SharedCode.Networking;
 using SharedCode.Packets.Client;
+using SharedCode.Packets.Sessions;
 
 namespace Client.Connection
 {
@@ -36,7 +37,17 @@ namespace Client.Connection
 
         void InitPacketCallbacks()
         {
+            PacketCallbacks.Add(new SPacketCallback() { packet = EClientPackets.Session, callback = OnSessionCallback });
+        }
 
+        void OnSessionCallback(byte[] arguments)
+        {
+            SSessionPacket SessionPacket = CSerialization.Deserialize<SSessionPacket>(arguments);
+
+            if(SessionPacket.Packet == ESessionPackets.Introduction)
+            {
+                ClientSocket.SendPacket<SSessionPacket>((byte)EClientPackets.Session, SessionPacket);
+            }
         }
 
         private void ClientSocket_OnClientReceivedData(byte[] buffer)
@@ -50,7 +61,14 @@ namespace Client.Connection
                 Buffer.BlockCopy(buffer, 1, arguments, 0, arguments.Length);
             }
 
-
+            foreach(SPacketCallback callback in PacketCallbacks)
+            {
+                if(callback.packet == (EClientPackets)packet)
+                {
+                    callback.callback(arguments);
+                    break;
+                }
+            }
         }
 
         private void ClientSocket_OnClientDisconnected()

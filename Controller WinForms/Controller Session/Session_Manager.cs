@@ -10,20 +10,9 @@ using SharedCode.Packets.Sessions;
 
 namespace Controller_WinForms.Controller_Session
 {
-    enum ESessionType : int
-    {
-        FileManager = 0
-    }
-
-    struct SSession
-    {
-        public ESessionType type;
-        public IControllerSession session;
-    }
-
     class CSession_Manager
     {
-        private List<SSession> Sessions { get; }
+        private List<IControllerSession> Sessions { get; }
 
         private CConnection Connection { get; }
 
@@ -32,7 +21,7 @@ namespace Controller_WinForms.Controller_Session
         public CSession_Manager(CConnection Connection)
         {
             RandomInstance = new Random();
-            Sessions = new List<SSession>();
+            Sessions = new List<IControllerSession>();
             this.Connection = Connection;
         }
 
@@ -46,9 +35,9 @@ namespace Controller_WinForms.Controller_Session
 
                 bool success = true;
 
-                foreach(SSession Session in Sessions)
+                foreach(IControllerSession Session in Sessions)
                 {
-                    if(Session.session.Id == attempt)
+                    if(Session.Id == attempt)
                     {
                         success = false;
                         break;
@@ -64,34 +53,45 @@ namespace Controller_WinForms.Controller_Session
             return Id;
         }
 
-        public void StartSession<T>(ESessionType type, SClient Client)
+        void SendIntroduction(IControllerSession session)
         {
-            SSession Session = new SSession
+            SSessionPacket SessionPacket = new SSessionPacket
             {
-                type = type,
-                session = (IControllerSession)Activator.CreateInstance<T>()
+                SessionId = session.Id,
+                ClientHandle = session.Client.SocketHandle,
+                Packet = ESessionPackets.Introduction,
+                ControllerKey = Program.Key
             };
 
-            lock(Sessions)
-            {
-                Session.session.Id = GenerateSessionId();
-                Session.session.Client = Client;
-                Session.session.Connection = Connection;
-                Session.session.StartSession();
+            Connection.SendPacket<SSessionPacket>(EControllerPackets.Session, SessionPacket);
+        }
 
-                Sessions.Add(Session);
+        public void StartSession<T>(SClient Client)
+        {
+            IControllerSession session = (IControllerSession)Activator.CreateInstance<T>();
+
+            session.Client = Client;
+            session.Connection = Connection;
+
+            lock (Sessions)
+            {
+                session.Id = GenerateSessionId();
+
+                Sessions.Add(session);
             }
+
+            SendIntroduction(session);
         }
 
         public void SessionPacketReceived(SSessionPacket SessionPacket)
         {
             lock(Sessions)
             {
-                foreach(SSession Session in Sessions)
+                foreach(IControllerSession Session in Sessions)
                 {
-                    if(Session.session.Id == SessionPacket.SessionId)
+                    if(Session.Id == SessionPacket.SessionId)
                     {
-                        Session.session.OnPacketReceived(SessionPacket.Packet, SessionPacket.data);
+                        Session.OnPacketReceived(SessionPacket.Packet, SessionPacket.data);
                         break;
                     }
                 }

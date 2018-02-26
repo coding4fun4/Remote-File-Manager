@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SharedCode.Packets.Controller
 {
-    enum EControllerPackets : byte
+    public enum EControllerPackets : byte
     {
         Introduction = 0x0,
         SyncData = 0x1,

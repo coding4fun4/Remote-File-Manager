@@ -198,5 +198,10 @@ namespace Controller_WinForms.Connection
         {
             ClientSocket.StartConnectingToServer();
         }
+
+        public void SendPacket<T>(EControllerPackets packet, T arguments)
+        {
+            ClientSocket.SendPacket<T>((byte)packet, arguments);
+        }
     }
 }

@@ -14,6 +14,8 @@ namespace Controller_WinForms
         public static int Port { get; set; } = 44444;
         public static string Password { get; set; } = "abcd";
 
+        public static int Key { get; set; } = -1;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

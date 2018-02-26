@@ -23,8 +23,6 @@ namespace Controller_WinForms
 
         private CSession_Manager SessionManager { get; }
 
-        private int Key { get; set; }
-
         public FrmController()
         {
             InitializeComponent();
@@ -59,7 +57,7 @@ namespace Controller_WinForms
 
         private void Connection_OnUpdateKey(int key)
         {
-            Key = key;
+            Program.Key = key;
 
             UpdateTitle(string.Format("Controller [WinForms] [{0}]", key));
         }
@@ -178,7 +176,7 @@ namespace Controller_WinForms
         {
             foreach (ListViewItem item in LvClients.SelectedItems)
             {
-                SessionManager.StartSession<FrmFileManager>(ESessionType.FileManager, (SClient)item.Tag);
+                SessionManager.StartSession<FrmFileManager>((SClient)item.Tag);
             }
         }
     }
